@@ -68,6 +68,7 @@ code {
 /* || Navbar */
 
 .nav_container {
+	position: absolute;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -79,18 +80,17 @@ code {
 	width: 100vw;
 	padding-left: 2em;
 	padding-right: 1em;
-	position: absolute;
+	z-index: 1;
 }
 
 .nav_gfg_icon {
 	display: inline-flex;
-	height: 100%;
 	align-items: center;
 	position: relative;
-	top: 0;
 	left: auto;
 	right: auto;
 	height: 8.85vh;
+	z-index: 1;
 }
 
 .nav_options--block1 {
@@ -121,7 +121,7 @@ code {
 	width: 100vw;
 	transform-origin: top;
 	position: absolute;
-	z-index: 1;
+	z-index: 2;
 	animation: open-menu 0.5s ease-in-out forwards;
 }
 
@@ -234,6 +234,83 @@ input {
 	background-color: antiquewhite;
 }
 
+@keyframes error-popup {
+	0% {
+		display: block;
+	}
+	100% {
+		display: none;
+	}
+}
+
+/* .animate-error-popup {
+	animation: error-popup 0.5s ease-in-out 1;
+} */
+
+.login-button:hover {
+	transform: scaleY(1.2) scaleX(1.2);
+}
+
 /* || Problem Page */
 
-/* || Problem Statement Section */
+.hover-pointer:hover{
+	cursor: col-resize;
+}
+
+.compile-button {
+	color: #fff;
+	background-color: orange;
+	height: 80%;
+	margin: 2.5%;
+	border-radius: 5px;
+}
+
+.submit-button {
+	color: #fff;
+	background-color: green;
+	height: 80%;
+	margin: 2.5%;
+	border-radius: 5px;
+}
+
+.hover\:no-color-change-scale-1\.2:hover {
+	transform: scaleY(1.1) scaleX(1.1);
+}
+
+/* || Output Overlay Section */
+
+@keyframes output-popup {
+	0% {
+		transform: scaleY(0);
+	}
+	100% {
+		transform: scaleY(1);
+	}
+}
+
+.animate-output-popup {
+	animation: output-popup 0.5s ease-in-out 1;
+	transform-origin: bottom;
+}
+
+/* || Problems Page */
+
+.hover\:scale-y-1\.2:hover {
+	transform: scaleY(1.2);
+	background-color: #7c827a;
+	cursor: pointer;
+}
+
+@keyframes filterbox-popup {
+	0% {
+		transform: scaleX(0)
+	}
+	100% {
+		transform: scaleX(1)
+	}
+}
+
+.animate-filterbox-popup {
+	animation: filterbox-popup 0.5s ease-in-out 1;
+	transform-origin: left;
+}

@@ -16,8 +16,9 @@ import CloseIcon from '@mui/icons-material/Close';
 import PersonIcon from '@mui/icons-material/Person';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import LogoutIcon from '@mui/icons-material/Logout';
+import LoginOutlined from '@mui/icons-material/LoginOutlined';
 
-const NavBar = ({mode, setMode, color, bgColor, loginStatus}) => {
+const NavBar = ({mode, setMode, color, bgColor, loginStatus, setLoginBoxStatus}) => {
 
     const [hamStatus, setHamStatus] = useState('closed')
     const [profStatus, setProfStatus] = useState('closed')
@@ -245,17 +246,43 @@ const NavBar = ({mode, setMode, color, bgColor, loginStatus}) => {
         )
     }
 
-    const ProfileBox = () => {
+    const LoginIcon = styled(LoginOutlined)`
+        color: ${color};
+        height: 100%;
+    `
+
+    const LoginButton = styled(Button)`
+        width: fit-content;
+        display: flex;
+        align-items: center;
+    `
+
+    const ProfileOrLoginBox = () => {
+
         return (
             <>
                 {
                     (loginStatus === true) ? 
                         <Button onClick={handleProfPress}><ProfileIcon/></Button>
                     : 
-                        <></>
+                        <LoginButton onClick={handleLoginPress}>
+                            <LoginIcon/>
+                            {
+                                (screenWidth >= 768) ?
+                                    <Typography fontFamily={'consolas, sans-serif'} style={{textTransform: 'capitalize', color: `${color}`}}>
+                                        Login
+                                    </Typography>
+                                : 
+                                    <></>
+                            }
+                        </LoginButton>
                 }
             </>
         )
+    }
+
+    const handleLoginPress = () => {
+        setLoginBoxStatus('open')
     }
 
     const handleProfPress = () => {
@@ -289,7 +316,7 @@ const NavBar = ({mode, setMode, color, bgColor, loginStatus}) => {
 
                 <div className="hidden md:flex nav_options--block1 ">
                     <div className="nav_options--block1-button">
-                        <Button onClick={() => handleMenuOptionClick('explore')}>
+                        <Button onClick={() => handleMenuOptionClick('problems')}>
                             <ButtonText>Problems</ButtonText>
                         </Button>
                     </div>
@@ -317,7 +344,7 @@ const NavBar = ({mode, setMode, color, bgColor, loginStatus}) => {
                     <div className="hidden md:flex">
                         <Button><BellIcon/></Button>
                     </div>
-                    <ProfileBox/>
+                    <ProfileOrLoginBox/>
                 </div>
             </Nav>
 

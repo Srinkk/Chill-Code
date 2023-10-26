@@ -36,18 +36,20 @@ const Login = ({color, bgColor, setLoginBoxStatus}) => {
     }, [])
 
     const LoginMain = styled(Box)`
-        border: 1px solid green;
+        position: fixed;
+        top: 0;
         width: 100vw;
-        height: 91.15vh;
-        z-index: 0;
+        height: 100vh;
+        max-height: fit-content;
+        z-index: 2;
         display: flex;
         justify-content: center;
         align-items: center;
-        backdrop-filter: blur(5px);
+        backdrop-filter: blur(10px);
     `
 
     const LoginBox = styled(Box)`
-        border: 2px dotted ${color};
+        border: 2px dotted #838783;
         max-width: 80%;
         min-width: 40%;
         height: 80%;
@@ -67,7 +69,7 @@ const Login = ({color, bgColor, setLoginBoxStatus}) => {
         justify-content: space-between;
         align-items: center;
         font-size: 2em;
-        color: ${color};
+        color: #838783;
     `
 
     const LoginText = ({fontSize}) => {
@@ -92,13 +94,14 @@ const Login = ({color, bgColor, setLoginBoxStatus}) => {
     `
 
     const CloseIcon = styled(CloseRoundedIcon)`
-        color: ${color};
+        // color: ${color};
+        color: #838783;
         width: 100%;
         height: 100%;
     `
 
     const LoginBody = styled(Box)`
-        border: 1px solid ${color};
+        // border: 1px solid ${color};
         width: 100%;
         height: 50%;
         display: flex;
@@ -107,41 +110,24 @@ const Login = ({color, bgColor, setLoginBoxStatus}) => {
     `
 
     const EmailInputBox = styled(Box)`
-        border: 1px solid ${color};
-        color: ${color};
+        // border: 1px solid ${color};
+        // color: ${color};
+        color: #838783;
         width: 100%;
         height: 40%;
         display: flex;
         flex-direction: column;
+        justify-content: space-evenly;
         align-items: flex-start;
         padding: 0 5%;
     `
 
-    const PasswordBox = styled(Box)`
-        border: 1px solid ${color};
-        width: 100%;
-        height: 40%;
-        color: ${color};
+    const PasswordBox = styled(EmailInputBox)`
     `
-    // document.addEventListener('DOMContentLoaded', function() {
-    //     const inputEmail = document.getElementById('inputEmail')
-    //     const inputPassword = document.getElementById('inputPassword')
-        
-    //     inputEmail.addEventListener('input', function(event) {
-    //         console.log(event.target.value)
-    //         setEmail(event.target.value)
-    //     })
-    //     inputPassword.addEventListener('input', function(event) {
-    //         setPassword(event.target.value)
-    //     })
-    // })
-
-    useEffect(() => {
-        console.log(email)
-    }, [email])
 
     const handleEmailChange = (e) => {
         setEmail(e.target.value)
+        console.log(e.target.value)
         // e.preventDefault()
     }
 
@@ -149,18 +135,20 @@ const Login = ({color, bgColor, setLoginBoxStatus}) => {
         setPassword(e.target.value)
     }
 
-    const handleFormSubmit = (e) => {
-        // e.preventDefault()
-    }
+    const ErrorBox = styled(Box)`
+        color: ${color};
+    `
 
     const ErrorText = () => {
         return (
-            <Typography fontFamily={'consolas, sans-serif'}></Typography>
+            <ErrorBox className="animate-error-popup">
+                <Typography fontFamily={'consolas, sans-serif'}>{error}</Typography>
+            </ErrorBox>
         )
     }
 
     const LoginFooter = styled(Box)`
-        border: 1px solid ${color};
+        // border: 1px solid ${color};
         width: 100%;
         height: 30%;
         display: flex;
@@ -173,32 +161,57 @@ const Login = ({color, bgColor, setLoginBoxStatus}) => {
     const LoginFooterLoginSignupBox = styled(Box)`
         width: 100%;
         height: 40%;
-        border: 1px solid red;
+        // border: 1px solid red;
         display: flex;
-        justify-content: space-around;
+        justify-content: space-between;
         align-items: center;
     `
 
     const SignupButtonBox = styled(Box)`
-        border: 1px solid ${color};
-        width: 47%;
+        // border: 1px solid ${color};
+        width: 49%;
         height: 100%;
     `
 
     const LoginButtonBox = styled(Box)`
-        border: 1px solid ${color};
+        // border: 1px solid ${color};
         width: 47%;
         height: 100%;
     `
 
     const GoogleButtonBox = styled(Box)`
-        border: 1px solid ${color};
+        // border: 1px solid ${color};
         width: 100%;
         height: 40%;
     `
 
+    const StyledButton = styled(Button)`
+        width: 100%;
+        height: 100%;
+        // color: ${color};
+        color: #838783;
+        border: 1px solid #838783;
+        border-radius: 15px;
+    `
+
+    const GoogleButton = styled(StyledButton)`
+
+    `
+
+    const handleGoogleSignin = () => {
+
+    }
+
+    const handleSignup = () => {
+
+    }
+
+    const handleLogin = () => {
+
+    }
+
     return (
-        <>
+        // <>
             <LoginMain>
                 <LoginBox className="sm:width-80 animate-open-login-popup">
                     <LoginHeader>
@@ -215,15 +228,11 @@ const Login = ({color, bgColor, setLoginBoxStatus}) => {
                     <LoginBody>
                         <EmailInputBox>
                             <Typography fontFamily={'consolas, sans-serif'}>Your E-mail:</Typography>
-                            <form onSubmit={handleFormSubmit}>
-                                <input type='text' placeholder='Your e-mail' value={email} onChange={handleEmailChange}/>
-                            </form>
+                            <input type='text' id="email" name="email" placeholder='Your e-mail' value={email} onChange={handleEmailChange} autoComplete="true"/>
                         </EmailInputBox>
                         <PasswordBox>
                             <Typography fontFamily={'consolas, sans-serif'}>Your password:</Typography>
-                            <form onSubmit={handleFormSubmit}>
-                                <input type='password' placeholder='Your password' value={password} onChange={handlePasswordChange}/>
-                            </form>
+                            <input type='password' id='password' name='password' placeholder='Your password' value={password} onChange={handlePasswordChange} autoComplete="true"/>
                         </PasswordBox>
                         {
                             (error !== null) && <ErrorText/>
@@ -231,16 +240,32 @@ const Login = ({color, bgColor, setLoginBoxStatus}) => {
                     </LoginBody>
                     <LoginFooter>
                         <LoginFooterLoginSignupBox>
-                            <SignupButtonBox></SignupButtonBox>
-                            <LoginButtonBox></LoginButtonBox>
+                            <SignupButtonBox>
+                                <StyledButton onClick={handleSignup}>
+                                    <Typography fontFamily={'consolas, sans-serif'} style={{textTransform: 'capitalize'}}>
+                                        Signup
+                                    </Typography>
+                                </StyledButton>
+                            </SignupButtonBox>
+                            <LoginButtonBox>
+                                <StyledButton onClick={handleLogin}>
+                                <Typography fontFamily={'consolas, sans-serif'} style={{textTransform: 'capitalize'}}>
+                                    Login
+                                </Typography>
+                                </StyledButton>
+                            </LoginButtonBox>
                         </LoginFooterLoginSignupBox>
                         <GoogleButtonBox>
-
+                            <GoogleButton onClick={handleGoogleSignin}>
+                                <Typography fontFamily={'consolas, sans-serif'} style={{textTransform: 'capitalize'}}>
+                                    Sign in with Google
+                                </Typography>
+                            </GoogleButton>
                         </GoogleButtonBox>
                     </LoginFooter>
                 </LoginBox>
             </LoginMain>
-        </>
+        // </>
     )
 }
 
