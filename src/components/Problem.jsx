@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react"
-import { useLocation, useLocalSearchParams } from "react-router-dom";
+import { useState, useEffect, useContext } from "react"
+import { useLocation, useNavigate } from "react-router-dom";
 import Editor from "@monaco-editor/react";
+
+import UserContext from "../contexts/UserContext";
 
 import { Box, Button, Typography, Menu, MenuItem } from "@mui/material"
 import styled from "@emotion/styled"
@@ -9,12 +11,15 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import CachedIcon from '@mui/icons-material/Cached';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
-import TimerOffOutlinedIcon from '@mui/icons-material/TimerOffOutlined';
+// import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
+// import TimerOffOutlinedIcon from '@mui/icons-material/TimerOffOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 
-const Problems = ({color, bgColor, loginStatus, setLoginBoxStatus}) => {
+const Problems = ({color, bgColor, setLoginBoxStatus}) => {
+
+    const userContext = useContext(UserContext)
+    const loginStatus = userContext.user.loginStatus
 
     const [screenWidth, setScreenWidth] = useState(window.innerWidth)
     const [sliderPosition, setSliderPosition] = useState(50)
@@ -22,9 +27,15 @@ const Problems = ({color, bgColor, loginStatus, setLoginBoxStatus}) => {
     const [language, setLanguage] = useState("C++")
     const [code, setCode] = useState('snippet')
 
+    const navigate = useNavigate()
     const location = useLocation()
     const searchParams = new URLSearchParams(location.search)
     const id = searchParams.get('id')
+
+    useEffect(() => {
+        if (id === null || id === '')
+            navigate('/problems')
+    }, [])
 
     const [problem, setProblem] = useState({id: '1', title: 'Two Sum', companyTags: ['amazon', 'facebook', 'google'], body: 'This is the Problem Statement of Two Sum', difficulty: 'Easy', accuracy: '100%', submissions: '100K+', points: '2', examples: [{input: 'input 1', output: 'output 1', explanation: 'explanation 1'}, {input: 'input 2', output: 'output 2', explanation: 'explanation 2'}], constraints: ['1 < N < 2', '1 < T <= 5000']})
 

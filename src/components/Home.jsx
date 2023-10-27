@@ -1,10 +1,19 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
+import { useNavigate } from "react-router-dom"
+
 import Login from "./Login"
+
+import UserContext from "../contexts/UserContext"
 
 import { Box, Typography, Button } from "@mui/material"
 import styled from "@emotion/styled"
 
 const Home = ({color, bgColor, loginBoxStatus, setLoginBoxStatus}) => {
+
+    const userContext = useContext(UserContext)
+    const loginStatus = userContext.user.loginStatus
+
+    const navigate = useNavigate()
 
     // const [loginBoxStatus, setLoginBoxStatus] = useState('closed')
     const [screenWidth, setScreenWidth] = useState(window.innerWidth)
@@ -17,6 +26,11 @@ const Home = ({color, bgColor, loginBoxStatus, setLoginBoxStatus}) => {
         return () => {
             window.removeEventListener('resize', handleResize)
         }
+    }, [])
+
+    useEffect(() => {
+        if (loginStatus === true) 
+            navigate('/problems')
     }, [])
 
     const MainBox = styled(Box)`

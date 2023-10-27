@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom';
+
+import UserContext from '../contexts/UserContext';
 
 import { Box, Button, Typography, Checkbox } from "@mui/material"
 import styled from '@emotion/styled';
@@ -7,11 +9,13 @@ import styled from '@emotion/styled';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import CloseOutlined from '@mui/icons-material/CloseOutlined';
 
-const Problems = ({color, bgColor, loginStatus}) => {
-
-    const [screenWidth, setScreenWidth] = useState(window.innerWidth)
+const Problems = ({color, bgColor}) => {
 
     const navigate = useNavigate()
+    const userContext = useContext(UserContext)
+    const loginStatus = userContext.user.loginStatus
+
+    const [screenWidth, setScreenWidth] = useState(window.innerWidth)
 
     const [easyChecked, setEasyChecked] = useState(false)
     const [mediumChecked, setMediumChecked] = useState(false)
@@ -209,7 +213,6 @@ const Problems = ({color, bgColor, loginStatus}) => {
                 width: 100%;
                 height: 50%;
                 color: #fff;
-
             `
 
             const handleSolveClick = (problemId) => {

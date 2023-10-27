@@ -314,3 +314,21 @@ input {
 	animation: filterbox-popup 0.5s ease-in-out 1;
 	transform-origin: left;
 }
+
+/* || Profile Page */
+
+.hover\:display:hover {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
+}
+
+.hover\:pointer:hover {
+	cursor: pointer;
+}
+
+.hover\:color-348c16 {
+	background-color: #348c16;
+}

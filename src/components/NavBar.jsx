@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import UserContext from '../contexts/UserContext';
 
 import { Button, ButtonGroup, Typography } from '@mui/material';
 import styled from '@emotion/styled';
@@ -18,7 +20,10 @@ import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginOutlined from '@mui/icons-material/LoginOutlined';
 
-const NavBar = ({mode, setMode, color, bgColor, loginStatus, setLoginBoxStatus}) => {
+const NavBar = ({mode, setMode, color, bgColor, setLoginBoxStatus}) => {
+
+    const userContext = useContext(UserContext)
+    const loginStatus = userContext.user.loginStatus
 
     const [hamStatus, setHamStatus] = useState('closed')
     const [profStatus, setProfStatus] = useState('closed')

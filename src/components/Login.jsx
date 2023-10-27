@@ -5,13 +5,24 @@ import styled from "@emotion/styled"
 
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
-const Login = ({color, bgColor, setLoginBoxStatus}) => {
+import {jwtDecode} from 'jwt-decode'
+import { GoogleLogin } from '@react-oauth/google'
+
+const Login = ({color, setLoginBoxStatus}) => {
 
     const [screenWidth, setScreenWidth] = useState(window.innerWidth)
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState(null)
+
+    const onLoginSuccess = async (res) => {
+        const decoded = jwtDecode(res.credential)
+        console.log(decoded)
+    }
+    const onLoginError = (res) => {
+        console.log("Login failed", res)
+    }
 
     useEffect(() => {
         function handleResize() {
@@ -101,7 +112,6 @@ const Login = ({color, bgColor, setLoginBoxStatus}) => {
     `
 
     const LoginBody = styled(Box)`
-        // border: 1px solid ${color};
         width: 100%;
         height: 50%;
         display: flex;
@@ -110,8 +120,6 @@ const Login = ({color, bgColor, setLoginBoxStatus}) => {
     `
 
     const EmailInputBox = styled(Box)`
-        // border: 1px solid ${color};
-        // color: ${color};
         color: #838783;
         width: 100%;
         height: 40%;
@@ -136,7 +144,7 @@ const Login = ({color, bgColor, setLoginBoxStatus}) => {
     }
 
     const ErrorBox = styled(Box)`
-        color: ${color};
+        color: red;
     `
 
     const ErrorText = () => {
@@ -148,7 +156,6 @@ const Login = ({color, bgColor, setLoginBoxStatus}) => {
     }
 
     const LoginFooter = styled(Box)`
-        // border: 1px solid ${color};
         width: 100%;
         height: 30%;
         display: flex;
@@ -161,26 +168,22 @@ const Login = ({color, bgColor, setLoginBoxStatus}) => {
     const LoginFooterLoginSignupBox = styled(Box)`
         width: 100%;
         height: 40%;
-        // border: 1px solid red;
         display: flex;
         justify-content: space-between;
         align-items: center;
     `
 
     const SignupButtonBox = styled(Box)`
-        // border: 1px solid ${color};
         width: 49%;
         height: 100%;
     `
 
     const LoginButtonBox = styled(Box)`
-        // border: 1px solid ${color};
         width: 47%;
         height: 100%;
     `
 
     const GoogleButtonBox = styled(Box)`
-        // border: 1px solid ${color};
         width: 100%;
         height: 40%;
     `
@@ -188,14 +191,14 @@ const Login = ({color, bgColor, setLoginBoxStatus}) => {
     const StyledButton = styled(Button)`
         width: 100%;
         height: 100%;
-        // color: ${color};
         color: #838783;
         border: 1px solid #838783;
         border-radius: 15px;
     `
 
     const GoogleButton = styled(StyledButton)`
-
+        display: flex;
+        gap: 10px;
     `
 
     const handleGoogleSignin = () => {
@@ -257,9 +260,16 @@ const Login = ({color, bgColor, setLoginBoxStatus}) => {
                         </LoginFooterLoginSignupBox>
                         <GoogleButtonBox>
                             <GoogleButton onClick={handleGoogleSignin}>
-                                <Typography fontFamily={'consolas, sans-serif'} style={{textTransform: 'capitalize'}}>
-                                    Sign in with Google
-                                </Typography>
+                                {
+                                    (screenWidth >= 768) &&
+                                        <Typography fontFamily={'consolas, sans-serif'} style={{textTransform: 'capitalize'}}>
+                                            Sign in with Google -&gt;
+                                        </Typography>
+                                }
+                                <GoogleLogin
+                                    onSuccess = {onLoginSuccess}
+                                    onError = {onLoginError}
+                                />
                             </GoogleButton>
                         </GoogleButtonBox>
                     </LoginFooter>
