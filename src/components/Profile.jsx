@@ -25,34 +25,17 @@ const Profile = ({color, bgColor}) => {
 
     const username = user.username
     const [editingUsername, setEditingUsername] = useState(false)
-
-    const userSolved = 1
+    const userSolved = user.solvedProblems.easy + user.solvedProblems.medium + user.solvedProblems.hard
     const totalProblems = 5
     const solvedToTotalRatio = (userSolved / totalProblems) * 100
-    const hardSolved = 1
-    const mediumSolved = 2
-    const easySolved = 3
-    const streak = 7
-    const userRating = 1.4
-    const error = null
+    const hardSolved = user.solvedProblems.hard
+    const mediumSolved = user.solvedProblems.medium
+    const easySolved = user.solvedProblems.easy
+    const streak = user.streak
+    const userRating = user.rating
+    const [error, setError] = useState(null)
 
-    const solvedProblems = [
-        {
-            id: '3',
-            title: 'Three Sum',
-            difficulty: 'Easy'
-        },
-        {
-            id: '2',
-            title: 'Rotate a 2D Matrix',
-            difficulty: 'Medium'
-        },
-        {
-            id: '1',
-            title: 'Two Sum',
-            difficulty: 'Easy'
-        }
-    ]
+    const solvedProblems = user.solvedProblems.problems
 
     useEffect(() => {
         function handleResize() {
