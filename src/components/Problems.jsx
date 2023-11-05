@@ -25,13 +25,9 @@ const Problems = ({color, bgColor}) => {
     const [hardChecked, setHardChecked] = useState(false)
 
     const [showFilterComponent, setShowFilterComponent] = useState(false)
-<<<<<<< HEAD
+
 
     const userSolved = user.solvedProblems.easy + user.solvedProblems.medium + user.solvedProblems.hard
-=======
-  
-    const userSolved = 1
->>>>>>> 291204dc795dc1c84307c48bc299a07585ac9d0f
     const totalProblems = 5
     const solvedToTotalRatio = (userSolved / totalProblems) * 100
     const hardSolved = user.solvedProblems.hard
@@ -39,22 +35,7 @@ const Problems = ({color, bgColor}) => {
     const easySolved = user.solvedProblems.easy
 
     let problemOfTheDay = {}
-
-<<<<<<< HEAD
-    const problemOfTheDay = {
-        id: '1',
-        title: 'Two Sum',
-        companyTags: [
-            'amazon',
-            'google'
-        ],
-        difficulty: 'Easy',
-        submissions: '100K+',
-        accuracy: '90%'
-    }
-=======
     let problemsLoaded = []
->>>>>>> 291204dc795dc1c84307c48bc299a07585ac9d0f
 
     useEffect(() => {
         axios.get( 'http://localhost:3500/problem' ).then(( res ) => {
