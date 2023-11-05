@@ -5,7 +5,7 @@ import UserContext from '../contexts/UserContext';
 
 import { Box, Button, Typography, Checkbox } from "@mui/material"
 import styled from '@emotion/styled';
-
+import axios from 'axios';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import CloseOutlined from '@mui/icons-material/CloseOutlined';
 
@@ -18,44 +18,29 @@ const Problems = ({color, bgColor}) => {
 
     const [screenWidth, setScreenWidth] = useState(window.innerWidth)
 
+    // const [problems,setProblems] = useState([''])
+
     const [easyChecked, setEasyChecked] = useState(false)
     const [mediumChecked, setMediumChecked] = useState(false)
     const [hardChecked, setHardChecked] = useState(false)
 
     const [showFilterComponent, setShowFilterComponent] = useState(false)
+<<<<<<< HEAD
 
     const userSolved = user.solvedProblems.easy + user.solvedProblems.medium + user.solvedProblems.hard
+=======
+  
+    const userSolved = 1
+>>>>>>> 291204dc795dc1c84307c48bc299a07585ac9d0f
     const totalProblems = 5
     const solvedToTotalRatio = (userSolved / totalProblems) * 100
     const hardSolved = user.solvedProblems.hard
     const mediumSolved = user.solvedProblems.medium
     const easySolved = user.solvedProblems.easy
 
-    const problemsLoaded = [
-        {
-            id: '3',
-            title: 'Three Sum',
-            companyTags: [
-                'amazon',
-                'google'
-            ],
-            difficulty: 'Easy',
-            submissions: '80K+',
-            accuracy: '80%'
-        },
-        {
-            id: '2',
-            title: 'Rotate a 2D Matrix',
-            companyTags: [
-                'google',
-                'facebook'
-            ],
-            difficulty: 'Medium',
-            submissions: '50K+',
-            accuracy: '85%'
-        }
-    ]
+    let problemOfTheDay = {}
 
+<<<<<<< HEAD
     const problemOfTheDay = {
         id: '1',
         title: 'Two Sum',
@@ -67,8 +52,24 @@ const Problems = ({color, bgColor}) => {
         submissions: '100K+',
         accuracy: '90%'
     }
+=======
+    let problemsLoaded = []
+>>>>>>> 291204dc795dc1c84307c48bc299a07585ac9d0f
 
     useEffect(() => {
+        axios.get( 'http://localhost:3500/problem' ).then(( res ) => {
+           problemsLoaded = res.data
+           console.log(problemsLoaded)
+        }).catch( error => {
+            console.log( error );
+        });
+        
+        axios.get( 'http://localhost:3500/problemOfTheDay' ).then(( res ) => {
+            problemOfTheDay = res.data
+            console.log(problemOfTheDay)
+        }).catch((error) => {
+            console.log(error)
+        })
         function handleResize() {
             setScreenWidth(window.innerWidth)
         }
@@ -77,6 +78,7 @@ const Problems = ({color, bgColor}) => {
             window.removeEventListener('resize', handleResize)
         }
     }, [])
+    
 
     const DesktopViewComponent = () => {
         const ProblemMainBox = styled(Box)`
@@ -773,9 +775,9 @@ const Problems = ({color, bgColor}) => {
                                         <ProblemCard problem={problemOfTheDay}/>
                                     </ProblemOfTheDayBox>
                                     {
-                                        problemsLoaded.map((problem) => {
+                                        problemsLoaded?.map((problem, id) => {
                                             return (
-                                                <ProblemCard problem={problem}/>
+                                                <ProblemCard key = { id } problem = {problem}/>
                                             )
                                         })
                                     }

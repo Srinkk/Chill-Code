@@ -15,6 +15,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 // import TimerOffOutlinedIcon from '@mui/icons-material/TimerOffOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import axios from "axios";
 
 const Problems = ({color, bgColor, setLoginBoxStatus}) => {
 
@@ -400,6 +401,15 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
     `
 
     const handleCompile = () => {
+        axios.post('http://localhost:3500/problem/run',{
+            language : language,
+            code : code ,
+            _id : id,
+        }).then((response)=>{
+            console.log(response.data)
+        }).catch((err)=>{
+            console.log(err)
+        })
         setOutputActive(true)
     }
 
@@ -410,6 +420,16 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
     `
 
     const handleSubmit = () => {
+        axios.post('http://localhost:3500/problem/submit',{
+            user_id : userContext.id,
+            problem_id : id,
+            code : code,
+            language : language
+        }).then((res)=>{
+            console.log(res)
+        }).catch((err)=>{
+            console.log(err)
+        })
         setOutputActive(true)
     }
 
@@ -662,16 +682,16 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
                             <Typography fontFamily={'consolas, sans-serif'} style={{fontSize: '0.8rem'}}>
                                 Submissions: {problem.submissions}
                             </Typography>
-                            <Typography fontFamily={'consolas, sans-serif'} style={{fontSize: '0.8rem'}}>
+                            {/* <Typography fontFamily={'consolas, sans-serif'} style={{fontSize: '0.8rem'}}>
                                 Points: {problem.points}
-                            </Typography>
+                            </Typography> */}
                         </ProblemPropertiesAndStats>
                         {
-                            (problem.companyTags?.length > 0) && 
+                            (problem.company?.length > 0) && 
                             <ProblemCompanyTags>
                                 <Typography fontFamily={'consolas, sans-serif'} style={{fontWeight: 'bold', fontSize: '0.8rem'}}>Asked by:</Typography>
                                 {
-                                    problem.companyTags.map((company) => {
+                                    problem.company.map((company) => {
                                         return (
                                             <img src={`../images/${company}.png`} alt={`${company}`} height={'100%'} width={'20px'}/>
                                         )
@@ -682,7 +702,7 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
                         <ProblemStatementBody>
                             <Typography fontFamily={'consolas, sans-serif'} style={{textAlign: 'left', padding: '2%', display: 'flex', flexDirection: 'column'}}>
                                 {/* <Typography fontFamily={'consolas, sans-serif'} style={{fontWeight: 'bold', marginRight: '2%'}}>Problem Statement:</Typography> */}
-                                {problem.body}
+                                {problem.desc}
                             </Typography>
                             {
                                 problem.examples.map((example, index) => {
@@ -901,16 +921,16 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
                             <Typography fontFamily={'consolas, sans-serif'} style={{fontSize: '0.8rem'}}>
                                 Submissions: {problem.submissions}
                             </Typography>
-                            <Typography fontFamily={'consolas, sans-serif'} style={{fontSize: '0.8rem'}}>
+                            {/* <Typography fontFamily={'consolas, sans-serif'} style={{fontSize: '0.8rem'}}>
                                 Points: {problem.points}
-                            </Typography>
+                            </Typography> */}
                         </ProblemPropertiesAndStats>
                         {
-                            (problem.companyTags?.length > 0) && 
+                            (problem.company?.length > 0) && 
                             <ProblemCompanyTags>
                                 <Typography fontFamily={'consolas, sans-serif'} style={{fontWeight: 'bold', fontSize: '0.8rem'}}>Asked by:</Typography>
                                 {
-                                    problem.companyTags.map((company) => {
+                                    problem.company.map((company) => {
                                         return (
                                             <img src={`../images/${company}.png`} alt={`${company}`} height={'100%'} width={'20px'}/>
                                         )
@@ -921,7 +941,7 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
                         <ProblemStatementBody>
                             <Typography fontFamily={'consolas, sans-serif'} style={{textAlign: 'left', padding: '2%', display: 'flex', flexDirection: 'column'}}>
                                 {/* <Typography fontFamily={'consolas, sans-serif'} style={{fontWeight: 'bold', marginRight: '2%'}}>Problem Statement:</Typography> */}
-                                {problem.body}
+                                {problem.desc}
                             </Typography>
                             {
                                 problem.examples.map((example, index) => {
