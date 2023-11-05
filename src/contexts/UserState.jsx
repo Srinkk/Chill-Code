@@ -6,8 +6,10 @@ const UserState = (props) => {
         id: '',
         username: '',
         e_mail: '',
-        problems: [],
+        solvedProblems: [],
         profilePhoto: '',
+        rating: '',
+        streak: '',
         loginStatus: false
     }
     const [user, setUser] = useState(emptyUser)
@@ -17,8 +19,10 @@ const UserState = (props) => {
             id: user._id,
             username: user.username,
             e_mail: user.e_mail,
-            problems: user.problems,
+            solvedProblems: user.solvedProblems,
             profilePhoto: '',
+            rating: user.rating,
+            streak: user.streak,
             loginStatus: true
         })
     }

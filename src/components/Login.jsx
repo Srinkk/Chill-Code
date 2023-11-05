@@ -17,14 +17,6 @@ const Login = ({color, setLoginBoxStatus}) => {
 
     const userContext = useContext(UserContext)
 
-    const onLoginSuccess = async (res) => {
-        const decoded = jwtDecode(res.credential)
-        console.log(decoded)
-    }
-    const onLoginError = (res) => {
-        console.log("Login failed", res)
-    }
-
     useEffect(() => {
         function handleResize() {
             setScreenWidth(window.innerWidth)
@@ -178,10 +170,6 @@ const Login = ({color, setLoginBoxStatus}) => {
         gap: 10px;
     `
 
-    const handleGoogleSignin = () => {
-
-    }
-
     const handleSignup = () => {
         const emailval = emailRef.current.value
         const pwdval = pwdRef.current.value
@@ -215,84 +203,100 @@ const Login = ({color, setLoginBoxStatus}) => {
         })
     }
 
+    const onLoginSuccess = async (res) => {
+        const decoded = jwtDecode(res.credential)
+        console.log(decoded)
+
+        axios.post('http://localhost:3500/user/googleauth', {email: decoded.email, email_verified: decoded.email_verified})
+        .then((response) => {
+            userContext.updateUser(response.data.user)
+            console.log(response.data.user)
+            setLoginBoxStatus('closed')
+        })
+        .catch((error) => {
+            setError(error.response?.data.message)
+        })
+    }
+    const onLoginError = (res) => {
+        console.log("Login failed", res)
+    }
+
     return (
-        // <>
-            <LoginMain>
-                <LoginBox className="sm:width-80 animate-open-login-popup">
-                    <LoginHeader>
-                        {
-                            (screenWidth >= 820) ?
-                                <LoginText fontSize={'2rem'}/>
-                            :
-                                <LoginText fontSize={'1.5rem'}/>
-                        }
-                        <CloseButtonBox className="sm:width-25">
-                            <CustomButton onClick={() => setLoginBoxStatus('closed')}><CloseIcon/></CustomButton>
-                        </CloseButtonBox>
-                    </LoginHeader>
-                    <LoginBody>
-                        <form style={{height: '100%', width: '100%'}}>
-                            <div className="login-inputbox">
-                                <label htmlFor="email" for ="email" style={{fontFamily: 'consolas, sans-serif', color: '#838783', textAlign: 'left'}}>Your E-mail:</label>
-                                <input
-                                    ref={emailRef}
-                                    name="email"
-                                    id="email"
-                                    type="text"
-                                    placeholder='Your e-mail'
-                                />
-                            </div>
-                            <div className="login-inputbox">
-                                <label htmlFor="email" for ="email" style={{fontFamily: 'consolas, sans-serif', color: '#838783', textAlign: 'left'}}>Your Password:</label>
-                                <input
-                                    ref={pwdRef}
-                                    name="password"
-                                    id="password"
-                                    type="password"
-                                    placeholder='Your password'
-                                />
-                            </div>
-                        </form>
-                        {
-                            (error !== null) && <ErrorText/>
-                        }
-                    </LoginBody>
-                    <LoginFooter>
-                        <LoginFooterLoginSignupBox>
-                            <SignupButtonBox>
-                                <StyledButton onClick={handleSignup}>
-                                    <Typography fontFamily={'consolas, sans-serif'} style={{textTransform: 'capitalize'}}>
-                                        Signup
-                                    </Typography>
-                                </StyledButton>
-                            </SignupButtonBox>
-                            <LoginButtonBox>
-                                <StyledButton onClick={handleLogin}>
+        <LoginMain>
+            <LoginBox className="sm:width-80 animate-open-login-popup">
+                <LoginHeader>
+                    {
+                        (screenWidth >= 820) ?
+                            <LoginText fontSize={'2rem'}/>
+                        :
+                            <LoginText fontSize={'1.5rem'}/>
+                    }
+                    <CloseButtonBox className="sm:width-25">
+                        <CustomButton onClick={() => setLoginBoxStatus('closed')}><CloseIcon/></CustomButton>
+                    </CloseButtonBox>
+                </LoginHeader>
+                <LoginBody>
+                    <form style={{height: '100%', width: '100%'}}>
+                        <div className="login-inputbox">
+                            <label htmlFor="email" for ="email" style={{fontFamily: 'consolas, sans-serif', color: '#838783', textAlign: 'left'}}>Your E-mail:</label>
+                            <input
+                                ref={emailRef}
+                                name="email"
+                                id="email"
+                                type="text"
+                                placeholder='Your e-mail'
+                            />
+                        </div>
+                        <div className="login-inputbox">
+                            <label htmlFor="email" for ="email" style={{fontFamily: 'consolas, sans-serif', color: '#838783', textAlign: 'left'}}>Your Password:</label>
+                            <input
+                                ref={pwdRef}
+                                name="password"
+                                id="password"
+                                type="password"
+                                placeholder='Your password'
+                            />
+                        </div>
+                    </form>
+                    {
+                        (error !== null) && <ErrorText/>
+                    }
+                </LoginBody>
+                <LoginFooter>
+                    <LoginFooterLoginSignupBox>
+                        <SignupButtonBox>
+                            <StyledButton onClick={handleSignup}>
                                 <Typography fontFamily={'consolas, sans-serif'} style={{textTransform: 'capitalize'}}>
-                                    Login
+                                    Signup
                                 </Typography>
-                                </StyledButton>
-                            </LoginButtonBox>
-                        </LoginFooterLoginSignupBox>
-                        <GoogleButtonBox>
-                            <GoogleButton onClick={handleGoogleSignin}>
-                                {
-                                    (screenWidth >= 768) &&
-                                        <Typography fontFamily={'consolas, sans-serif'} style={{textTransform: 'capitalize'}}>
-                                            Sign in with Google -&gt;
-                                        </Typography>
-                                }
-                                <GoogleLogin
-                                    onSuccess = {onLoginSuccess}
-                                    onError = {onLoginError}
-                                />
-                            </GoogleButton>
-                        </GoogleButtonBox>
-                    </LoginFooter>
-                   
-                </LoginBox>
-            </LoginMain>
-        // </>
+                            </StyledButton>
+                        </SignupButtonBox>
+                        <LoginButtonBox>
+                            <StyledButton onClick={handleLogin}>
+                            <Typography fontFamily={'consolas, sans-serif'} style={{textTransform: 'capitalize'}}>
+                                Login
+                            </Typography>
+                            </StyledButton>
+                        </LoginButtonBox>
+                    </LoginFooterLoginSignupBox>
+                    <GoogleButtonBox>
+                        <GoogleButton>
+                            {
+                                (screenWidth >= 768) &&
+                                    <Typography fontFamily={'consolas, sans-serif'} style={{textTransform: 'capitalize'}}>
+                                        Sign in with Google -&gt;
+                                    </Typography>
+                            }
+                            <GoogleLogin
+                                onSuccess = {onLoginSuccess}
+                                onError = {onLoginError}
+                            />
+                        </GoogleButton>
+                    </GoogleButtonBox>
+                </LoginFooter>
+                
+            </LoginBox>
+        </LoginMain>
     )
 }
 

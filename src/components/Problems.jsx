@@ -13,7 +13,8 @@ const Problems = ({color, bgColor}) => {
 
     const navigate = useNavigate()
     const userContext = useContext(UserContext)
-    const loginStatus = userContext.user.loginStatus
+    const user = userContext.user
+    const loginStatus = user.loginStatus
 
     const [screenWidth, setScreenWidth] = useState(window.innerWidth)
 
@@ -23,12 +24,12 @@ const Problems = ({color, bgColor}) => {
 
     const [showFilterComponent, setShowFilterComponent] = useState(false)
 
-    const userSolved = 1
+    const userSolved = user.solvedProblems.easy + user.solvedProblems.medium + user.solvedProblems.hard
     const totalProblems = 5
     const solvedToTotalRatio = (userSolved / totalProblems) * 100
-    const hardSolved = 1
-    const mediumSolved = 2
-    const easySolved = 3
+    const hardSolved = user.solvedProblems.hard
+    const mediumSolved = user.solvedProblems.medium
+    const easySolved = user.solvedProblems.easy
 
     const problemsLoaded = [
         {
@@ -66,8 +67,6 @@ const Problems = ({color, bgColor}) => {
         submissions: '100K+',
         accuracy: '90%'
     }
-
-    // const problemsLoaded = []
 
     useEffect(() => {
         function handleResize() {
