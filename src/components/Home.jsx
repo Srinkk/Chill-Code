@@ -145,9 +145,9 @@ const Home = ({color, bgColor, loginBoxStatus, setLoginBoxStatus}) => {
             <Box>
                 {
                     (color === '#fff') ?
-                        <img src='../images/sample-for-home.jpg' alt="Image couldn't be loaded." height='80%' width='80%'/>
+                        <img src='../images/sample-for-home.png' alt="Image couldn't be loaded." height='85%' width='85%'/>
                     :
-                        <img src='../images/sample-for-home.jpg' alt="Image couldn't be loaded." height='80%' width='80%'/>
+                        <img src='../images/sample-for-home.png' alt="Image couldn't be loaded." height='85%' width='85%'/>
                 }   
             </Box>
         )
