@@ -1,7 +1,6 @@
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect, useContext, useRef } from "react"
 import { useLocation, useNavigate } from "react-router-dom";
 import Editor from "@monaco-editor/react";
-
 import UserContext from "../contexts/UserContext";
 
 import { Box, Button, Typography, Menu, MenuItem } from "@mui/material"
@@ -26,7 +25,7 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
     const [sliderPosition, setSliderPosition] = useState(50)
 
     const [language, setLanguage] = useState("C++")
-    const [code, setCode] = useState('snippet')
+    const [snippet, setSnippet] = useState('')
 
     const navigate = useNavigate()
     const location = useLocation()
@@ -36,14 +35,28 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
     useEffect(() => {
         if (id === null || id === '')
             navigate('/problems')
+        else {
+            const fetchProblemData = async() => {
+                await axios.post('http://localhost:3500/problem/show', {_id: id})
+                .then((response) => {
+                    setProblem(response.data)
+                    console.log(problem)
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+            }
+            fetchProblemData()
+        }
     }, [])
 
-    const [problem, setProblem] = useState({id: '1', title: 'Two Sum', companyTags: ['amazon', 'facebook', 'google'], body: 'This is the Problem Statement of Two Sum', difficulty: 'Easy', accuracy: '100%', submissions: '100K+', points: '2', examples: [{input: 'input 1', output: 'output 1', explanation: 'explanation 1'}, {input: 'input 2', output: 'output 2', explanation: 'explanation 2'}], constraints: ['1 < N < 2', '1 < T <= 5000']})
-
+    // const [problem, setProblem] = useState({id: 1, title: 'Two Sum', companyTags: ['amazon', 'facebook', 'google'], body: 'This is the Problem Statement of Two Sum', difficulty: 'Easy', accuracy: '100%', submissions: '100K+', points: '2', examples: [{input: 'input 1', output: 'output 1', explanation: 'explanation 1'}, {input: 'input 2', output: 'output 2', explanation: 'explanation 2'}], constraints: ['1 < N < 2', '1 < T <= 5000']})
+    const [problem, setProblem] = useState(null)
     const [outputActive, setOutputActive] = useState(false)
     const [outputError, setOutputError] = useState({message: 'An error occurred.'})
 
     useEffect(() => {
+
         function handleResize() {
             setScreenWidth(window.innerWidth)
         }
@@ -367,7 +380,7 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
     `
 
     const handleReloadCodeSnippet = () => {
-        setCode('snippet')
+        setSnippet('snippet')
     }
 
     const handleFullScreenOpen = () => {
@@ -380,9 +393,9 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
         border-bottom: 1px solid #b8b8b8;
     `
 
-    const handleEditorChange = (newCode) => {
-        setCode(newCode)
-    }
+    // const handleEditorChange = (newCode) => {
+    //     setCode(newCode)
+    // }
 
     const RightBoxFooter = styled(Box)`
         width: 100%;
@@ -403,7 +416,7 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
     const handleCompile = () => {
         axios.post('http://localhost:3500/problem/run',{
             language : language,
-            code : code ,
+            code : getEditorValue(),
             _id : id,
         }).then((response)=>{
             console.log(response.data)
@@ -422,8 +435,8 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
     const handleSubmit = () => {
         axios.post('http://localhost:3500/problem/submit',{
             user_id : userContext.id,
-            problem_id : id,
-            code : code,
+            problem_id : problem._id,
+            code : getEditorValue(),
             language : language
         }).then((res)=>{
             console.log(res)
@@ -431,6 +444,16 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
             console.log(err)
         })
         setOutputActive(true)
+    }
+
+    const editorRef = useRef(null)
+
+    const handleEditorMount = (editor, monaco) => {
+        editorRef.current = editor
+    }
+
+    const getEditorValue = () => {
+        return editorRef.current.getValue()
     }
 
     const ForceLoginBox = styled(Box)`
@@ -663,31 +686,35 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
                         </SlidingLeftBoxHeaderButton>
                     </SlidingLeftBoxHeader>
                     <SlidingLeftBoxBody>
-                        <ProblemStatementTitle>
-                            <Typography
-                                fontFamily={'consolas, sans-serif'}
-                                style={{fontSize: '1.5rem'}}
-                            >
-                                {problem.id}. {problem.title}
-                            </Typography>
+                        <ProblemStatementTitle> {
+                            (problem !== null) &&
+                                <Typography
+                                    fontFamily={'consolas, sans-serif'}
+                                    style={{fontSize: '1.5rem'}}
+                                >
+                                    {problem._id}. {problem.title}
+                                </Typography>
+                            }
                             <BugIcon/>
                         </ProblemStatementTitle>
                         <ProblemPropertiesAndStats>
-                            <Typography fontFamily={'consolas, sans-serif'} style={{fontWeight: 'bold', fontSize: '0.8rem'}}>
-                                {problem.difficulty}
-                            </Typography>
-                            <Typography fontFamily={'consolas, sans-serif'} style={{fontSize: '0.8rem'}}>
-                                Accuracy: {problem.accuracy}
-                            </Typography>
-                            <Typography fontFamily={'consolas, sans-serif'} style={{fontSize: '0.8rem'}}>
-                                Submissions: {problem.submissions}
-                            </Typography>
-                            {/* <Typography fontFamily={'consolas, sans-serif'} style={{fontSize: '0.8rem'}}>
-                                Points: {problem.points}
-                            </Typography> */}
+                            {
+                                (problem !== null) && 
+                                <> 
+                                    <Typography fontFamily={'consolas, sans-serif'} style={{fontWeight: 'bold', fontSize: '0.8rem'}}>
+                                        {problem.difficulty}
+                                    </Typography>
+                                    <Typography fontFamily={'consolas, sans-serif'} style={{fontSize: '0.8rem'}}>
+                                        Accuracy: {problem.accuracy}
+                                    </Typography>
+                                    <Typography fontFamily={'consolas, sans-serif'} style={{fontSize: '0.8rem'}}>
+                                        Submissions: {problem.submissions}
+                                    </Typography>
+                                </>
+                            }
                         </ProblemPropertiesAndStats>
                         {
-                            (problem.company?.length > 0) && 
+                            (problem?.company?.length > 0) && 
                             <ProblemCompanyTags>
                                 <Typography fontFamily={'consolas, sans-serif'} style={{fontWeight: 'bold', fontSize: '0.8rem'}}>Asked by:</Typography>
                                 {
@@ -702,10 +729,10 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
                         <ProblemStatementBody>
                             <Typography fontFamily={'consolas, sans-serif'} style={{textAlign: 'left', padding: '2%', display: 'flex', flexDirection: 'column'}}>
                                 {/* <Typography fontFamily={'consolas, sans-serif'} style={{fontWeight: 'bold', marginRight: '2%'}}>Problem Statement:</Typography> */}
-                                {problem.desc}
+                                {problem?.desc}
                             </Typography>
                             {
-                                problem.examples.map((example, index) => {
+                                problem?.examples.map((example, index) => {
                                     return (
                                         <ExampleBox>
                                             <Typography fontFamily={'consolas, sans-serif'} fontWeight={'bold'}>
@@ -730,7 +757,7 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
                                 })
                             }
                             {
-                                (problem.constraints?.length > 0) &&
+                                (problem?.constraints?.length > 0) &&
                                 <ConstraintsBox>  
                                     <Typography fontFamily={'consolas, sans-serif'} style={{fontWeight: 'bold', fontSize: '1.1rem', textAlign: 'left'}}>
                                         Constraints:
@@ -784,9 +811,8 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
                             className='problem_code_editor'
                             height="100%"
                             width ="100%"
-                            language={language}
                             theme="vs-dark"
-                            value={code}
+                            onMount={handleEditorMount}
                             options={{
                                 inlineSuggest: true,
                                 fontSize: "16px",
@@ -794,7 +820,6 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
                                 autoClosingBrackets: true,
                                 minimap: { scale: 10 }
                             }} 
-                            onChange={handleEditorChange}
                         />
                     </SlidingRightBoxBody>
                     <SlidingRightBoxFooter>
@@ -1006,9 +1031,8 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
                             className='problem_code_editor'
                             height="100%"
                             width ="100%"
-                            language={language}
                             theme="vs-dark"
-                            value={code}
+                            onMount={handleEditorMount}
                             options={{
                                 inlineSuggest: true,
                                 fontSize: "16px",
@@ -1016,7 +1040,6 @@ const Problems = ({color, bgColor, setLoginBoxStatus}) => {
                                 autoClosingBrackets: true,
                                 minimap: { scale: 10 }
                             }} 
-                            onChange={handleEditorChange}
                         />
                         
                     </NonSlidingRightBoxBody>

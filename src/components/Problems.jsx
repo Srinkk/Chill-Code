@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
 import axios from 'axios';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import CloseOutlined from '@mui/icons-material/CloseOutlined';
+import { type } from '@testing-library/user-event/dist/type';
 
 const Problems = ({color, bgColor}) => {
 
@@ -35,22 +36,22 @@ const Problems = ({color, bgColor}) => {
     const easySolved = user.solvedProblems.easy
 
     let problemOfTheDay = {}
-    let problemsLoaded = []
+    let [problemsLoaded, setProblemsLoaded] = useState(null)
 
     useEffect(() => {
-        axios.get( 'http://localhost:3500/problem' ).then(( res ) => {
-           problemsLoaded = res.data
-           console.log(problemsLoaded)
-        }).catch( error => {
-            console.log( error );
+        axios.get( 'http://localhost:3500/problem' )
+        .then((res) => {   
+            console.log(res.data.problems)
+            setProblemsLoaded(res.data)
+            console.log('this is problemsLoaded: ' + typeof(problemsLoaded?.problems))
+            // problemsLoaded.problems.map((problem) => {
+            //     console.log(problem)
+            // })
+            console.log(problemsLoaded)
+        }).catch((error) => {
+            console.log(error);
         });
         
-        axios.get( 'http://localhost:3500/problemOfTheDay' ).then(( res ) => {
-            problemOfTheDay = res.data
-            console.log(problemOfTheDay)
-        }).catch((error) => {
-            console.log(error)
-        })
         function handleResize() {
             setScreenWidth(window.innerWidth)
         }
@@ -60,6 +61,14 @@ const Problems = ({color, bgColor}) => {
         }
     }, [])
     
+    useEffect(() => {
+        axios.get( 'http://localhost:3500/problemOfTheDay' ).then(( res ) => {
+            problemOfTheDay = res.data
+            console.log(problemOfTheDay)
+        }).catch((error) => {
+            console.log(error)
+        })
+    }, [])
 
     const DesktopViewComponent = () => {
         const ProblemMainBox = styled(Box)`
@@ -226,7 +235,7 @@ const Problems = ({color, bgColor}) => {
                         </CompanyTags>
                     </TitleAndCompanyBox>
                     <SolveAndStatsBox>
-                        <SolveButton onClick={() => handleSolveClick(problem.id)}>
+                        <SolveButton onClick={() => handleSolveClick(problem._id)}>
                             <Typography fontFamily={'consolas, sans-serif'} style={{ textTransform: 'capitalize'}}>
                                 Solve Problem
                             </Typography>
@@ -391,7 +400,7 @@ const Problems = ({color, bgColor}) => {
                 </FilterBox>
                 <ProblemSetBox>
                     {
-                        (problemsLoaded?.length > 0) ?
+                        (problemsLoaded?.problems?.length > 0) ?
                             <>
                                 <Typography fontFamily={'consolas, sans-serif'} fontSize={'1.2rem'} style={{textAlign: 'left'}}>
                                     Problems: 
@@ -403,7 +412,7 @@ const Problems = ({color, bgColor}) => {
                                     <ProblemCard problem={problemOfTheDay}/>
                                 </ProblemOfTheDayBox>
                                 {
-                                    problemsLoaded.map((problem) => {
+                                    problemsLoaded.problems.map((problem) => {
                                         return (
                                             <ProblemCard problem={problem}/>
                                         )
@@ -744,7 +753,7 @@ const Problems = ({color, bgColor}) => {
                     }
                     <ProblemSetBox>
                         {
-                            (problemsLoaded?.length > 0) ?
+                            (problemsLoaded?.problems?.length > 0) ?
                                 <>
                                     <Typography fontFamily={'consolas, sans-serif'} fontSize={'1.2rem'} style={{textAlign: 'left'}}>
                                         Problems: 
@@ -756,9 +765,9 @@ const Problems = ({color, bgColor}) => {
                                         <ProblemCard problem={problemOfTheDay}/>
                                     </ProblemOfTheDayBox>
                                     {
-                                        problemsLoaded?.map((problem, id) => {
+                                        problemsLoaded.problems.map((problem) => {
                                             return (
-                                                <ProblemCard key = { id } problem = {problem}/>
+                                                <ProblemCard problem = {problem}/>
                                             )
                                         })
                                     }
