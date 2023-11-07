@@ -215,7 +215,7 @@ const Problems = ({color, bgColor}) => {
                         <CompanyTags>
                             <Typography fontFamily={'consolas, sans-serif'} style={{ fontSize: '0.8rem'}}>Asked by:</Typography>
                             {
-                                problem.company
+                                   <img src={`../images/${problem.company}.png`} alt={`${problem.company}`} height={'100%'} width={'20px'}/>          
                             }
                         </CompanyTags>
                     </TitleAndCompanyBox>

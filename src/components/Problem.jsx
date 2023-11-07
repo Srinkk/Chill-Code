@@ -25,9 +25,12 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
     const [sliderPosition, setSliderPosition] = useState(50)
 
     const [language, setLanguage] = useState("cpp")
+
     const [snippet, setSnippet] = useState('')
-    const [output, setOutput] = useState('')
-    const [error, setError] = useState('')
+    const [code, setCode] = useState('')
+    const [output, setOutput] = useState(null)
+    const [error, setError] = useState(null)
+    const [status, setStatus] = useState(null)
 
     const navigate = useNavigate()
     const location = useLocation()
@@ -440,15 +443,26 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
             language : language,
             code : getEditorValue(),
             _id : id,
-        }).then((response)=>{
-            console.log(response.data)
-            setOutput(response.data)
-        }).catch((err)=>{
-            console.log(err)
-           
+        }).then((response) => {
+            console.log(response.status)
+            console.log(response.data.message)
+            setStatus(response.status)
+            console.log("status",status)
+            if(status === 200 || status === 202) { 
+                setOutput(response)
+            }
+            else if(status === 203) {
+                setError(response.data.message)
+                console.log(error)
+            }
+            
+        }).catch((err) => {
+            console.log(err) 
+            setError(err)
+            setStatus(err.status)
         })
-    
-        setOutputActive(true)
+        if( output !== null || error !== null) setOutputActive(true) 
+
     }
 
     const SubmitButton = styled(Button)`
@@ -583,17 +597,35 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
 
                     {/* An iSLoading condition will be placed here. */}
                     {
-                        (error === null) ?
+                        (error !== null) ?
                             <OutputErrorBox>
+                            {
+                            (status === '203') ?
+                            
                                 <Typography fontFamily={'consolas, sans-serif'}>
-                                    {error?.message}
+                                    Compilation Failed!
                                 </Typography>
+                            :
+                                <Typography fontFamily={'consolas, sans-serif'}>
+                                    Test case failed!
+                                </Typography>
+                               
+                            }
+                                <Typography fontFamily={'consolas, sans-serif'}>
+                                    {error}
+                                </Typography>
+
                             </OutputErrorBox>
+
                         :
                             <SuccessBox>
+                            {
+                            (status === '200')&&
                                 <Typography fontFamily={'consolas, sans-serif'}>
                                     Test case passed succesfully!
                                 </Typography>
+                               
+                            } 
                             </SuccessBox>
                     }
                 </OutputBoxBody>
