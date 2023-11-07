@@ -472,19 +472,26 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
         height: 100%;
     `
 
-    const handleSubmit = () => {
-        const codeVal  = codeRef.current.value
-        axios.post('http://localhost:3500/problem/submit',{
-            user_id : userContext.id,
+    const handleSubmit = async(e) => {
+        setError(null)
+        setOutput(null)
+        e.preventDefault()
+        await axios.post('http://localhost:3500/problem/submit',{
+            user_id : userContext.user.id,
             problem_id : problem._id,
             code : getEditorValue(),
             language : language
-        }).then((res)=>{
-            console.log(res)
+        }).then((response) => {
+            console.log(response)
+            setStatus(response.status.toString())
+            setOutput(response.data.output)
+            if (status === '202') {
+                setError(response.data.message)
+            }
         }).catch((err)=>{
-            console.log(err)
+            setError(err.response.data.error)
         })
-        setOutputActive(true)
+        if( output !== null || error !== null) setOutputActive(true) 
     }
 
     const ForceLoginBox = styled(Box)`
@@ -622,12 +629,17 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
                         :
                             <SuccessBox>
                             {
-                            (status === 200)&&
-                                <Typography fontFamily={'consolas, sans-serif'}>
-                                    Test case passed succesfully!
-                                </Typography>
-                               
+                                (status === '200') &&
+                                    <Typography fontFamily={'consolas, sans-serif'}>
+                                        Test case passed succesfully!
+                                    </Typography>
                             } 
+                            {
+                                (status === '201') &&
+                                    <Typography fontFamily={'consolas, sans-serif'}>
+                                        Answer accepted!
+                                    </Typography>
+                            }
                             </SuccessBox>
                     }
                 </OutputBoxBody>
