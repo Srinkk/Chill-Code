@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
 import axios from 'axios';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import CloseOutlined from '@mui/icons-material/CloseOutlined';
+import { type } from '@testing-library/user-event/dist/type';
 
 const Problems = ({color, bgColor}) => {
 
@@ -33,8 +34,6 @@ const Problems = ({color, bgColor}) => {
     const hardSolved = user.solvedProblems.hard
     const mediumSolved = user.solvedProblems.medium
     const easySolved = user.solvedProblems.easy
-
-    
 
     useEffect(() => {
         const fetchProblems = async () => {
