@@ -18,8 +18,8 @@ const Problems = ({color, bgColor}) => {
 
     const [screenWidth, setScreenWidth] = useState(window.innerWidth)
 
-    // const [problems,setProblems] = useState([''])
-
+    const [problems,setProblems] = useState([])
+    const [potd, setPotd] = useState('')
     const [easyChecked, setEasyChecked] = useState(false)
     const [mediumChecked, setMediumChecked] = useState(false)
     const [hardChecked, setHardChecked] = useState(false)
@@ -34,23 +34,23 @@ const Problems = ({color, bgColor}) => {
     const mediumSolved = user.solvedProblems.medium
     const easySolved = user.solvedProblems.easy
 
-    let problemOfTheDay = {}
-    let problemsLoaded = []
+    
 
     useEffect(() => {
-        axios.get( 'http://localhost:3500/problem' ).then(( res ) => {
-           problemsLoaded = res.data
-           console.log(problemsLoaded)
-        }).catch( error => {
-            console.log( error );
-        });
-        
-        axios.get( 'http://localhost:3500/problemOfTheDay' ).then(( res ) => {
-            problemOfTheDay = res.data
-            console.log(problemOfTheDay)
-        }).catch((error) => {
-            console.log(error)
-        })
+        const fetchProblems = async () => {
+          try {
+            const problemsResponse = await axios.get('http://localhost:3500/problem');
+            const potdResponse = await axios.get('http://localhost:3500/problemOfTheDay');
+            const problemsLoaded = problemsResponse.data;
+            const problemOfTheDay = potdResponse.data;
+            setProblems(problemsLoaded.problems)
+            setPotd(problemOfTheDay);
+          } catch (error) {
+            console.error(error);
+          }
+        };
+      
+        fetchProblems();
         function handleResize() {
             setScreenWidth(window.innerWidth)
         }
@@ -59,8 +59,7 @@ const Problems = ({color, bgColor}) => {
             window.removeEventListener('resize', handleResize)
         }
     }, [])
-    
-
+ 
     const DesktopViewComponent = () => {
         const ProblemMainBox = styled(Box)`
             width: 100%;
@@ -217,16 +216,12 @@ const Problems = ({color, bgColor}) => {
                         <CompanyTags>
                             <Typography fontFamily={'consolas, sans-serif'} style={{ fontSize: '0.8rem'}}>Asked by:</Typography>
                             {
-                                problem.companyTags.map((company) => {
-                                    return (
-                                        <img src={`../images/${company}.png`} alt={`${company}`} height={'100%'} width={'20px'}/>
-                                    )
-                                })
+                                problem.company
                             }
                         </CompanyTags>
                     </TitleAndCompanyBox>
                     <SolveAndStatsBox>
-                        <SolveButton onClick={() => handleSolveClick(problem.id)}>
+                        <SolveButton onClick={() => handleSolveClick(problem._id)}>
                             <Typography fontFamily={'consolas, sans-serif'} style={{ textTransform: 'capitalize'}}>
                                 Solve Problem
                             </Typography>
@@ -390,31 +385,22 @@ const Problems = ({color, bgColor}) => {
                     </FilterBoxBody>
                 </FilterBox>
                 <ProblemSetBox>
-                    {
-                        (problemsLoaded?.length > 0) ?
-                            <>
-                                <Typography fontFamily={'consolas, sans-serif'} fontSize={'1.2rem'} style={{textAlign: 'left'}}>
-                                    Problems: 
-                                </Typography>
-                                <ProblemOfTheDayBox>
-                                    <Typography fontFamily={'consolas, sans-serif'} style={{textDecoration: 'underline'}}>
-                                        Problem of The Day
-                                    </Typography>
-                                    <ProblemCard problem={problemOfTheDay}/>
-                                </ProblemOfTheDayBox>
-                                {
-                                    problemsLoaded.map((problem) => {
-                                        return (
-                                            <ProblemCard problem={problem}/>
-                                        )
-                                    })
-                                }
-                            </>
-                        :
-                            <Typography fontFamily={'consolas, sans-serif'} fontSize={'1.2rem'}>
-                                Problems couldn't be loaded. Try re-loading the page.
+                        <Typography fontFamily={'consolas, sans-serif'} fontSize={'1.2rem'} style={{textAlign: 'left'}}>
+                            Problems: 
+                        </Typography>
+                        <ProblemOfTheDayBox>
+                            <Typography fontFamily={'consolas, sans-serif'} style={{textDecoration: 'underline'}}>
+                                Problem of The Day
                             </Typography>
-                    }
+                            <ProblemCard problem = {potd}/>
+                        </ProblemOfTheDayBox>
+                        {
+                            problems.map((problem,id) => (
+                                
+                            <ProblemCard key = {id} problem = {problem}/>
+                                
+                            ))
+                        }
                 </ProblemSetBox>
                 <UserStatsAndAdvertisements/>
             </ProblemMainBox>
@@ -611,24 +597,18 @@ const Problems = ({color, bgColor}) => {
             `
 
             return (
-                <ProblemCardBox>
+                 <ProblemCardBox>
                     <TitleAndCompanyBox>
                         <Typography fontFamily={'consolas, sans-serif'} style={{fontWeight: 'bold', fontSize: '1.2rem'}}>
-                            {problem.title}
+                            {problem.ttile}
                         </Typography>
                         <CompanyTags>
                             <Typography fontFamily={'consolas, sans-serif'} style={{ fontSize: '0.8rem'}}>Asked by:</Typography>
-                            {
-                                problem.companyTags.map((company) => {
-                                    return (
-                                        <img src={`../images/${company}.png`} alt={`${company}`} height={'100%'} width={'20px'}/>
-                                    )
-                                })
-                            }
+                                {problem.company}
                         </CompanyTags>
                     </TitleAndCompanyBox>
                     <SolveAndStatsBox>
-                        <SolveButton onClick={() => handleSolveClick(problem.id)}>
+                        <SolveButton onClick={() => handleSolveClick(problem._id)}>
                             <Typography fontFamily={'consolas, sans-serif'} style={{ textTransform: 'capitalize'}}>
                                 Solve
                             </Typography>
@@ -644,6 +624,7 @@ const Problems = ({color, bgColor}) => {
                         </StatsBox>
                     </SolveAndStatsBox>
                 </ProblemCardBox>
+              
             )
         }
 
@@ -743,31 +724,21 @@ const Problems = ({color, bgColor}) => {
                         </UserStatsBox>
                     }
                     <ProblemSetBox>
-                        {
-                            (problemsLoaded?.length > 0) ?
-                                <>
-                                    <Typography fontFamily={'consolas, sans-serif'} fontSize={'1.2rem'} style={{textAlign: 'left'}}>
-                                        Problems: 
-                                    </Typography>
-                                    <ProblemOfTheDayBox>
-                                        <Typography fontFamily={'consolas, sans-serif'} style={{textDecoration: 'underline'}}>
-                                            Problem of The Day
-                                        </Typography>
-                                        <ProblemCard problem={problemOfTheDay}/>
-                                    </ProblemOfTheDayBox>
-                                    {
-                                        problemsLoaded?.map((problem, id) => {
-                                            return (
-                                                <ProblemCard key = { id } problem = {problem}/>
-                                            )
-                                        })
-                                    }
-                                </>
-                            :
-                                <Typography fontFamily={'consolas, sans-serif'} fontSize={'1.2rem'}>
-                                    Problems couldn't be loaded. Try re-loading the page.
+                            <Typography fontFamily={'consolas, sans-serif'} fontSize={'1.2rem'} style={{textAlign: 'left'}}>
+                                Problems: 
+                            </Typography>
+                            <ProblemOfTheDayBox>
+                                <Typography fontFamily={'consolas, sans-serif'} style={{textDecoration: 'underline'}}>
+                                    Problem of The Day : {potd.title}   
                                 </Typography>
-                        }
+                            </ProblemOfTheDayBox>
+                            {
+                                problems.map((problem, id) => {
+                                    return (
+                                       <div key = {id} ><p>{problem.title}</p></div>
+                                    )
+                                })
+                            }
                     </ProblemSetBox>
                 </ProblemMainBox>
                 <FilterIconBox onClick={handleFilterIconClick}>
@@ -790,3 +761,11 @@ const Problems = ({color, bgColor}) => {
 }
 
 export default Problems
+
+
+
+// problem.company.map((company) => {
+//     return (
+//         <img src={`../images/${company}.png`} alt={`${company}`} height={'100%'} width={'20px'}/>
+//     )
+// })
