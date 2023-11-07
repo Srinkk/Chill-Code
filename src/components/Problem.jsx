@@ -16,8 +16,7 @@ import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import axios from "axios";
 
-const Problems = ({color, bgColor, setLoginBoxStatus, onChange}) => {
-    const codeRef = useRef()
+const Problem = ({color, bgColor, setLoginBoxStatus}) => {
 
     const userContext = useContext(UserContext)
     const loginStatus = userContext.user.loginStatus
@@ -26,6 +25,8 @@ const Problems = ({color, bgColor, setLoginBoxStatus, onChange}) => {
     const [sliderPosition, setSliderPosition] = useState(50)
 
     const [language, setLanguage] = useState("cpp")
+
+    const [snippet, setSnippet] = useState('')
     const [code, setCode] = useState('')
     const [output, setOutput] = useState(null)
     const [error, setError] = useState(null)
@@ -35,7 +36,6 @@ const Problems = ({color, bgColor, setLoginBoxStatus, onChange}) => {
     const location = useLocation()
     const searchParams = new URLSearchParams(location.search)
     const id = searchParams.get('id')
-    console.log("id:",id)
 
     useEffect(() => {
         if (id === null || id === '')
@@ -70,23 +70,19 @@ const Problems = ({color, bgColor, setLoginBoxStatus, onChange}) => {
         }
     }, [])
 
-    // const handleCompile = () => {
-    //     // if(codeRef.current){
-    //     const codeVal = codeRef.current
-    //     console.log("code :",codeVal)
-    //     axios.post('http://localhost:3500/problem/run',{
-    //         language : language,
-    //         code : codeVal ,
-    //         _id : id,
-    //     }).then((response)=>{
-    //         console.log(response.data)
-    //     }).catch((err)=>{
-    //         console.log(err)
-    //     })
-    
-    //     setOutputActive(true)
-    // }
-
+    useEffect(() => {
+        switch (language) {
+            case 'cpp':
+                setSnippet('// Enter your code here.')
+                break
+            case 'java':
+                setSnippet('// Enter your code here.')
+                break
+            case 'python':
+                setSnippet('## Enter your code here.')
+                break
+        }
+    }, [language])
 
     const LangSelectMenu = () => {
         const [anchorEl, setAnchorEl] = useState(null);
@@ -402,7 +398,7 @@ const Problems = ({color, bgColor, setLoginBoxStatus, onChange}) => {
     `
 
     const handleReloadCodeSnippet = () => {
-        
+
     }
 
     const handleFullScreenOpen = () => {
@@ -437,34 +433,29 @@ const Problems = ({color, bgColor, setLoginBoxStatus, onChange}) => {
     }
 
     const getEditorValue = () => {
-        return editorRef.current.getValue()
+        if (editorRef.current === null) return ''
+        else return editorRef.current.getValue()
     }
-    const handleCompile = async() => {
-        console.log("code :",getEditorValue())
+    const handleCompile = async(e) => {
+        setError(null)
+        setOutput(null)
+        e.preventDefault()
         await axios.post('http://localhost:3500/problem/run',{
             language : language,
             code : getEditorValue(),
             _id : id,
         }).then((response) => {
-            console.log(response.status)
-            console.log(response.data.message)
-            setStatus(response.status)
-            console.log("status",status)
-            if(status === 200 || status === 202) { 
-                setOutput(response)
-            }
-            else if(status === 203) {
+            console.log(response)
+            setStatus(response.status.toString())
+            setOutput(response.data.output)
+            if (status === '202') {
                 setError(response.data.message)
-                console.log(error)
             }
-            
         }).catch((err) => {
-            console.log(err) 
-            setError(err)
-            setStatus(err.status)
+            // compilation error handled here
+            setError(err.response.data.error)
         })
         if( output !== null || error !== null) setOutputActive(true) 
-
     }
 
     const SubmitButton = styled(Button)`
@@ -474,7 +465,6 @@ const Problems = ({color, bgColor, setLoginBoxStatus, onChange}) => {
     `
 
     const handleSubmit = () => {
-        const codeVal  = codeRef.current.value
         axios.post('http://localhost:3500/problem/submit',{
             user_id : userContext.id,
             problem_id : problem._id,
@@ -602,19 +592,17 @@ const Problems = ({color, bgColor, setLoginBoxStatus, onChange}) => {
                     {
                         (error !== null) ?
                             <OutputErrorBox>
-                            {
-                            (status === '203') ?
-                            
-                                <Typography fontFamily={'consolas, sans-serif'}>
-                                    Compilation Failed!
-                                </Typography>
-                            :
-                                <Typography fontFamily={'consolas, sans-serif'}>
-                                    Test case failed!
-                                </Typography>
-                               
-                            }
-                                <Typography fontFamily={'consolas, sans-serif'}>
+                                {
+                                    (status !== '202') &&
+                                    <Typography fontFamily={'consolas, sans-serif'}>
+                                        Compilation failed!
+                                    </Typography>
+                                }
+                                <Typography fontFamily={'consolas, sans-serif'} style={{
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    height: 'fit-content'
+                                }}>
                                     {error}
                                 </Typography>
 
@@ -742,7 +730,7 @@ const Problems = ({color, bgColor, setLoginBoxStatus, onChange}) => {
                                     fontFamily={'consolas, sans-serif'}
                                     style={{fontSize: '1.5rem'}}
                                 >
-                                    {problem._id}. {problem.title}
+                                    {problem.id}. {problem.title}
                                 </Typography>
                             }
                             <BugIcon/>
@@ -855,7 +843,7 @@ const Problems = ({color, bgColor, setLoginBoxStatus, onChange}) => {
                    
                     <SlidingRightBoxBody>
                         <Editor
-                            defaultValue="# Enter your code here"
+                            defaultValue={snippet}
                             id="code"
                             name="code"
                             className="problem_code_editor"
@@ -863,6 +851,7 @@ const Problems = ({color, bgColor, setLoginBoxStatus, onChange}) => {
                             height="100%"
                             width ="100%"
                             theme="vs-dark"
+                            value={getEditorValue()}
                             onMount={handleEditorMount}
                             options={{
                                 inlineSuggest: true,
@@ -1059,11 +1048,13 @@ const Problems = ({color, bgColor, setLoginBoxStatus, onChange}) => {
                    
                     <NonSlidingRightBoxBody>
                         <Editor 
+                            defaultValue={snippet}
                             className='problem_code_editor'
                             onMount={handleEditorMount}
                             height="100%"
                             width ="100%"
                             theme="vs-dark"
+                            value={getEditorValue()}
                             options={{
                                 inlineSuggest: true,
                                 fontSize: "16px",
@@ -1116,7 +1107,7 @@ const Problems = ({color, bgColor, setLoginBoxStatus, onChange}) => {
     )
 }
 
-export default Problems
+export default Problem
 
 // (problem.company?.length > 0) && 
 // <ProblemCompanyTags>
