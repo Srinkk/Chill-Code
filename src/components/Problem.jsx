@@ -601,7 +601,7 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
                         (error !== null) ?
                             <OutputErrorBox>
                                 {
-                                    (status !== '202') &&
+                                    (status !== '202' && status !== '201') &&
                                     <Typography fontFamily={'consolas, sans-serif'}>
                                         Compilation failed!
                                     </Typography>
