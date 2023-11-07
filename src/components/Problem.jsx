@@ -1,4 +1,3 @@
-import React from 'react';
 import { useState, useEffect, useContext, useRef } from "react"
 import { useLocation, useNavigate } from "react-router-dom";
 import Editor from "@monaco-editor/react";
@@ -37,7 +36,6 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
     const location = useLocation()
     const searchParams = new URLSearchParams(location.search)
     const id = searchParams.get('id')
-    console.log("id:",id)
 
     useEffect(() => {
         if (id === null || id === '')
@@ -54,7 +52,7 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
             try {
                 const problemsResponse = await axios.post('http://localhost:3500/problem/show', {_id : id});
                 
-                // console.log("response",problemsResponse.data)
+                console.log("response",problemsResponse.data)
                 setProblem(problemsResponse.data)
                 
             } catch (error) {
@@ -438,32 +436,26 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
         if (editorRef.current === null) return ''
         else return editorRef.current.getValue()
     }
-    const handleCompile = async() => {
-        console.log("code :",getEditorValue())
+    const handleCompile = async(e) => {
+        setError(null)
+        setOutput(null)
+        e.preventDefault()
         await axios.post('http://localhost:3500/problem/run',{
             language : language,
             code : getEditorValue(),
             _id : id,
         }).then((response) => {
-            console.log(response.status)
-            console.log(response.data.message)
-            setStatus(response.status)
-            console.log("status",status)
-            if(status === 200 || status === 202) { 
-                setOutput(response)
-            }
-            else if(status === 203) {
+            console.log(response)
+            setStatus(response.status.toString())
+            setOutput(response.data.output)
+            if (status === '202') {
                 setError(response.data.message)
-                console.log(error)
             }
-            
         }).catch((err) => {
-            console.log(err) 
-            setError(err)
-            setStatus(err.status)
+            // compilation error handled here
+            setError(err.response.data.error)
         })
         if( output !== null || error !== null) setOutputActive(true) 
-
     }
 
     const SubmitButton = styled(Button)`
@@ -473,9 +465,8 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
     `
 
     const handleSubmit = () => {
-        const codeVal  = codeRef.current.value
         axios.post('http://localhost:3500/problem/submit',{
-            user_id : userContext.id,
+            user_id : userContext.user.id,
             problem_id : problem._id,
             code : getEditorValue(),
             language : language
@@ -601,19 +592,17 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
                     {
                         (error !== null) ?
                             <OutputErrorBox>
-                            {
-                            (status === '203') ?
-                            
-                                <Typography fontFamily={'consolas, sans-serif'}>
-                                    Compilation Failed!
-                                </Typography>
-                            :
-                                <Typography fontFamily={'consolas, sans-serif'}>
-                                    Test case failed!
-                                </Typography>
-                               
-                            }
-                                <Typography fontFamily={'consolas, sans-serif'}>
+                                {
+                                    (status !== '202') &&
+                                    <Typography fontFamily={'consolas, sans-serif'}>
+                                        Compilation failed!
+                                    </Typography>
+                                }
+                                <Typography fontFamily={'consolas, sans-serif'} style={{
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    height: 'fit-content'
+                                }}>
                                     {error}
                                 </Typography>
 
@@ -622,7 +611,7 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
                         :
                             <SuccessBox>
                             {
-                            (status === 200)&&
+                            (status === '200')&&
                                 <Typography fontFamily={'consolas, sans-serif'}>
                                     Test case passed succesfully!
                                 </Typography>

@@ -69,7 +69,7 @@ const NavBar = ({mode, setMode, color, bgColor, setLoginBoxStatus}) => {
         return (
             <div className='nav_gfg_icon'>
                 <Button href='/'>
-                    <img src={iconSource} alt="GFG Icon" height='40' width='70'/>
+                    <img src={iconSource} alt="GFG Icon" height='50' width='70'/>
                 </Button>
             </div>
         )
