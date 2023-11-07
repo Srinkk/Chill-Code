@@ -401,7 +401,7 @@ const Problems = ({color, bgColor, setLoginBoxStatus, onChange}) => {
     `
 
     const handleReloadCodeSnippet = () => {
-        setSnippet('snippet')
+        
     }
 
     const handleFullScreenOpen = () => {
