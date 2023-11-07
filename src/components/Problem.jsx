@@ -28,8 +28,9 @@ const Problems = ({color, bgColor, setLoginBoxStatus, onChange}) => {
 
     const [language, setLanguage] = useState("cpp")
     const [code, setCode] = useState('')
-    const [output, setOutput] = useState('')
-    const [error, setError] = useState('')
+    const [output, setOutput] = useState(null)
+    const [error, setError] = useState(null)
+    const [status, setStatus] = useState(null)
 
     const navigate = useNavigate()
     const location = useLocation()
@@ -413,11 +414,7 @@ const Problems = ({color, bgColor, setLoginBoxStatus, onChange}) => {
         border-top: 1px solid #b8b8b8;
         border-bottom: 1px solid #b8b8b8;
     `
-    const handleEditorChange =  (e) => {
-        // e.preventdefault();
-        setCode(e);
-      }
-    
+
 
     const RightBoxFooter = styled(Box)`
         width: 100%;
@@ -443,21 +440,32 @@ const Problems = ({color, bgColor, setLoginBoxStatus, onChange}) => {
     const getEditorValue = () => {
         return editorRef.current.getValue()
     }
-    const handleCompile = () => {
+    const handleCompile = async() => {
         console.log("code :",getEditorValue())
-        axios.post('http://localhost:3500/problem/run',{
+        await axios.post('http://localhost:3500/problem/run',{
             language : language,
             code : getEditorValue() ,
             _id : id,
-        }).then((response)=>{
-            console.log(response.data)
-            setOutput(response.data)
-        }).catch((err)=>{
-            console.log(err)
-           
+        }).then((response) => {
+            console.log(response.status)
+            console.log(response.data.message)
+            setStatus(response.status)
+            console.log("status",status)
+            if(status === 200 || status === 202) { 
+                setOutput(response)
+            }
+            else if(status === 203) {
+                setError(response.data.message)
+                console.log(error)
+            }
+            
+        }).catch((err) => {
+            console.log(err) 
+            setError(err)
+            setStatus(err.status)
         })
-    
-        setOutputActive(true)
+        if( output !== null || error !== null) setOutputActive(true) 
+
     }
 
     const SubmitButton = styled(Button)`
@@ -593,17 +601,35 @@ const Problems = ({color, bgColor, setLoginBoxStatus, onChange}) => {
 
                     {/* An iSLoading condition will be placed here. */}
                     {
-                        (error === null) ?
+                        (error !== null) ?
                             <OutputErrorBox>
+                            {
+                            (status === '203') ?
+                            
                                 <Typography fontFamily={'consolas, sans-serif'}>
-                                    {error?.message}
+                                    Compilation Failed!
                                 </Typography>
+                            :
+                                <Typography fontFamily={'consolas, sans-serif'}>
+                                    Test case failed!
+                                </Typography>
+                               
+                            }
+                                <Typography fontFamily={'consolas, sans-serif'}>
+                                    {error}
+                                </Typography>
+
                             </OutputErrorBox>
+
                         :
                             <SuccessBox>
+                            {
+                            (status === '200')&&
                                 <Typography fontFamily={'consolas, sans-serif'}>
                                     Test case passed succesfully!
                                 </Typography>
+                               
+                            } 
                             </SuccessBox>
                     }
                 </OutputBoxBody>
