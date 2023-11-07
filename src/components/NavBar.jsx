@@ -64,12 +64,12 @@ const NavBar = ({mode, setMode, color, bgColor, setLoginBoxStatus}) => {
         color: ${color};
     `
 
-    const GFGIcon = () => {
-        const iconSource = `../images/gfg-icon-${mode}.png`
+    const ChillCodeIcon = () => {
+        const iconSource = `../images/cc-icon-${mode}.png`
         return (
             <div className='nav_gfg_icon'>
                 <Button href='/'>
-                    <img src={iconSource} alt="GFG Icon" height='50' width='70'/>
+                    <img src={iconSource} alt="CC Icon" height='50' width='80'/>
                 </Button>
             </div>
         )
@@ -353,7 +353,7 @@ const NavBar = ({mode, setMode, color, bgColor, setLoginBoxStatus}) => {
                 </div>
             </Nav>
 
-            <GFGIcon mode='light'/>
+            <ChillCodeIcon mode='light'/>
             
             {
                 (hamStatus === 'open') ? 
