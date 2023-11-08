@@ -1,5 +1,6 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios';
 import UserContext from '../contexts/UserContext'
 
 import { Box, Button, Typography } from '@mui/material'
@@ -10,7 +11,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
 const Profile = ({color, bgColor}) => {
-
+    const usernameRef = useRef()
     const navigate = useNavigate()
     const userContext = useContext(UserContext)
     const user = userContext.user
@@ -22,8 +23,9 @@ const Profile = ({color, bgColor}) => {
     }, [])
 
     const [screenWidth, setScreenWidth] = useState(window.innerWidth)
-
+    const [solvedProblems, setSolvedProblems] = useState([])
     const username = user.username
+    const [u_name, setUserName] = useState(username)
     const [editingUsername, setEditingUsername] = useState(false)
     const userSolved = user.solvedProblems.easy + user.solvedProblems.medium + user.solvedProblems.hard
     const totalProblems = 5
@@ -35,9 +37,22 @@ const Profile = ({color, bgColor}) => {
     const userRating = user.rating
     const [error, setError] = useState(null)
 
-    const solvedProblems = user.solvedProblems.problems
+   
 
     useEffect(() => {
+        const fetchProblems = async () =>{
+            try{
+                const problemResponse = await axios.post('http://localhost:3500/user/solved',{_id : user.id})
+                setSolvedProblems(problemResponse.data.solvedProblem)
+            } catch(err)
+            {   
+                setError(err.response.data)
+                console.log(error)
+            }
+        };
+
+        fetchProblems()
+        
         function handleResize() {
             setScreenWidth(window.innerWidth)
         }
@@ -118,7 +133,13 @@ const Profile = ({color, bgColor}) => {
         color: ${color};
     `
 
-    const handleSave = () => {
+    const handleSave = async() => {
+        const usernameVal = usernameRef.current.value
+        console.log("username",usernameVal)
+        await axios.patch('http://localhost:3500/user',{_id : user.id, e_mail : user.e_mail, username : usernameVal}).then((response)=>{
+            console.log(response.data.username)
+            setUserName(response.data.username)
+        })
         setEditingUsername(false)
     }
 
@@ -252,7 +273,9 @@ const Profile = ({color, bgColor}) => {
                                         }}>
                                             <input 
                                                 type='text'
-                                                value={username}
+                                                name = 'username'
+                                                id = 'username'
+                                                ref = {usernameRef}
                                                 style={{
                                                     width: '100%'
                                                 }}
@@ -265,14 +288,14 @@ const Profile = ({color, bgColor}) => {
                                             }}>
                                                 <div className="hover:pointer">
                                                     <SaveIcon 
-                                                        color={color}
-                                                        onClick={handleSave}
+                                                        color = {color}
+                                                        onClick = {handleSave}
                                                     />
                                                 </div>
                                                 <div className="hover:pointer">
                                                     <CloseRoundedIcon
-                                                        color={color}
-                                                        onClick={cancelUpdate}
+                                                        color = {color}
+                                                        onClick = {cancelUpdate}
                                                     />
                                                 </div>
                                             </Box>
@@ -286,7 +309,7 @@ const Profile = ({color, bgColor}) => {
                                             padding: '0 5px'
                                         }}>
                                             <Typography fontFamily={'consolas, sans-serif'} fontSize={'2rem'}>
-                                                {username}
+                                                {u_name}
                                             </Typography>
                                             <div className="hover:pointer">
                                                 <EditIcon
@@ -376,7 +399,7 @@ const Profile = ({color, bgColor}) => {
                                                         <Typography fontFamily={'consolas, sans-serif'} paddingTop={'5px'}>
                                                             {problem.difficulty}
                                                         </Typography>
-                                                        <SolveButton onClick={() => {handleSolveClicked(problem.id)}}>
+                                                        <SolveButton onClick={() => {handleSolveClicked(problem._id)}}>
                                                             <Typography fontFamily={'consolas, sans-serif'} textTransform={'capitalize'}>
                                                                 Try Again
                                                             </Typography>
@@ -461,6 +484,9 @@ const Profile = ({color, bgColor}) => {
                                         }}>
                                             <input 
                                                 type='text'
+                                                id = 'username'
+                                                name ='username'
+                                                ref = {usernameRef}
                                                 style={{
                                                     width: '100%'
                                                 }}
@@ -578,7 +604,7 @@ const Profile = ({color, bgColor}) => {
                                                         textAlign: 'center',
                                                         gap: '10px'
                                                     }}>
-                                                        <SolveButton onClick={() => {handleSolveClicked(problem.id)}}>
+                                                        <SolveButton onClick={() => {handleSolveClicked(problem._id)}}>
                                                             <Typography fontFamily={'consolas, sans-serif'} textTransform={'capitalize'}>
                                                                 Retry
                                                             </Typography>

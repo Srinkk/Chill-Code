@@ -25,7 +25,7 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
     const [sliderPosition, setSliderPosition] = useState(50)
 
     const [language, setLanguage] = useState("cpp")
-
+    const [solvedProblems, setSolvedProblems] = useState([])
     const [snippet, setSnippet] = useState('')
     const [code, setCode] = useState('')
     const [output, setOutput] = useState(null)
@@ -52,7 +52,7 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
             try {
                 const problemsResponse = await axios.post('http://localhost:3500/problem/show', {_id : id});
                 
-                console.log("response",problemsResponse.data)
+                // console.log("response",problemsResponse.data)
                 setProblem(problemsResponse.data)
                 
             } catch (error) {
@@ -71,17 +71,71 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
     }, [])
 
     useEffect(() => {
-        switch (language) {
-            case 'cpp':
-                setSnippet('// Enter your code here.')
-                break
-            case 'java':
-                setSnippet('// Enter your code here.')
-                break
-            case 'python':
-                setSnippet('## Enter your code here.')
-                break
+        const getProblem = async()=>{
+            let problemSolution = ' '
+            let isExists
+            try{ 
+                const res = await axios.post('http://localhost:3500/user/solved',{_id : userContext.user.id})
+                setSolvedProblems(res.data.solvedProblem)
+                const person = res.data.user
+                for (const problem of solvedProblems)
+                {
+                    
+                    if (problem._id === id)
+                    {
+                       
+                        for ( const p of person.solvedProblems.problems)
+                        {
+                            isExists = p.problemId.toString() === problem._id.toString()
+                            if (isExists)
+                            {
+                                if(language === 'cpp') {
+                                problemSolution = p.solution[0].cpp
+                                }
+                                else if(language === 'python') {
+                                problemSolution = p.solution[0].python
+                                }
+                                else {
+                                    problemSolution = p.solution[0].java
+                                }
+                               
+                            }
+                            
+                        }
+                    }
+                }
+            } catch(err) {
+                console.log(err)
+            }
+            console.log(problemSolution)
+            if(problemSolution !== ' ') {
+                setSnippet(problemSolution)
+                console.log(snippet)
+            } 
+            else { 
+            switch (language) {
+                case 'cpp':
+                    setSnippet('// Enter your code here.')
+                    break
+                case 'java':
+                    setSnippet('// Enter your code here.')
+                    break
+                case 'python':
+                    setSnippet('## Enter your code here.')
+                    break
+            }}
         }
+        getProblem()
+                
+        function handleResize() {
+            setScreenWidth(window.innerWidth)
+        }
+        window.addEventListener('resize', handleResize)
+        return () => {
+            window.removeEventListener('resize', handleResize)
+        }
+
+      
     }, [language])
 
     const LangSelectMenu = () => {
@@ -451,8 +505,9 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
             if (status === '202') {
                 setError(response.data.message)
             }
+            setOutputActive(true)
         }).catch((err) => {
-            // compilation error handled here
+            setStatus(err.response.status.toString())
             setError(err.response.data.error)
         })
         if( output !== null || error !== null) setOutputActive(true) 
@@ -474,14 +529,16 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
             code : getEditorValue(),
             language : language
         }).then((response) => {
-            console.log(response)
             setStatus(response.status.toString())
-            setOutput(response.data.output)
+            setOutput(response.data.output.output)
             if (status === '202') {
-                setError(response.data.message)
+                setError(response.data.output.message)
             }
+            setOutputActive(true)
         }).catch((err)=>{
-            setError(err.response.data.error)
+            setStatus(err.response.status.toString())
+            setError(err.response.data.message)
+          
         })
         if( output !== null || error !== null) setOutputActive(true) 
     }
@@ -613,6 +670,12 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
                                 }}>
                                     {error}
                                 </Typography>
+                                {
+                                    (status === '202') &&
+                                    <Typography fontFamily={'consolas, sans-serif'} >
+                                            Your answer is submitted!
+                                    </Typography>
+                                }
 
                             </OutputErrorBox>
 
@@ -1133,3 +1196,15 @@ export default Problem
 //         })
 //     }
 // </ProblemCompanyTags>
+
+// switch (language) {
+    //         case 'cpp':
+    //             setSnippet('// Enter your code here.')
+    //             break
+    //         case 'java':
+    //             setSnippet('// Enter your code here.')
+    //             break
+    //         case 'python':
+    //             setSnippet('## Enter your code here.')
+    //             break
+    //     }
