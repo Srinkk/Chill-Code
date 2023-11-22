@@ -625,7 +625,9 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
                     <Typography fontFamily={'consolas, sans-serif'} fontWeight={'bold'} fontSize={'1.1rem'} color={`${color}`}>
                         Output Window
                     </Typography>
-                    <CloseIcon onClick={() => {setOutputActive(false)}}/>
+                    <div className="hover:pointer">
+                        <CloseIcon onClick={() => {setOutputActive(false)}}/>
+                    </div>
                 </OutputBoxHeader>
                 <OutputBoxBody>
                     <Box>
@@ -804,9 +806,9 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
                             (problem !== null) &&
                                 <Typography
                                     fontFamily={'consolas, sans-serif'}
-                                    style={{fontSize: '1.5rem'}}
+                                    style={{fontSize: '1.5rem', textAlign: 'left'}}
                                 >
-                                    {problem.id}. {problem.title}
+                                    {problem?.id}. {problem?.title}
                                 </Typography>
                             }
                             <BugIcon/>
@@ -832,8 +834,12 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
                             <ProblemCompanyTags>
                                 <Typography fontFamily={'consolas, sans-serif'} style={{fontWeight: 'bold', fontSize: '0.8rem'}}>Asked by:</Typography>
                                 {
-                                   <img src={`../images/${problem.company}.png`} alt={`${problem.company}`} height={'100%'} width={'20px'}/>          
-                                }
+                                (problem.company) && problem.company.map(company => { 
+                                    return (              
+                                        <img src={`../images/${company}.png`} alt={`${company}`} height={'100%'} width={'20px'}/>          
+                                    )
+                                })                      
+                            }
                             </ProblemCompanyTags>
                         }
                         <ProblemStatementBody>
@@ -1047,21 +1053,21 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
                         <ProblemStatementTitle>
                             <Typography
                                 fontFamily={'consolas, sans-serif'}
-                                style={{fontSize: '1.5rem'}}
+                                style={{fontSize: '1.5rem', textAlign: 'left'}}
                             >
-                                {problem.id}. {problem.title}
+                                {problem?.id}. {problem?.title}
                             </Typography>
                             <BugIcon/>
                         </ProblemStatementTitle>
                         <ProblemPropertiesAndStats>
                             <Typography fontFamily={'consolas, sans-serif'} style={{fontWeight: 'bold', fontSize: '0.8rem'}}>
-                                {problem.difficulty}
+                                {problem?.difficulty}
                             </Typography>
                             <Typography fontFamily={'consolas, sans-serif'} style={{fontSize: '0.8rem'}}>
-                                Accuracy: {problem.accuracy}
+                                Accuracy: {problem?.accuracy}
                             </Typography>
                             <Typography fontFamily={'consolas, sans-serif'} style={{fontSize: '0.8rem'}}>
-                                Submissions: {problem.submissions}
+                                Submissions: {problem?.submissions}
                             </Typography>
                             {/* <Typography fontFamily={'consolas, sans-serif'} style={{fontSize: '0.8rem'}}>
                                 Points: {problem.points}
@@ -1071,17 +1077,21 @@ const Problem = ({color, bgColor, setLoginBoxStatus}) => {
                             <ProblemCompanyTags>
                                 <Typography fontFamily={'consolas, sans-serif'} style={{fontWeight: 'bold', fontSize: '0.8rem'}}>Asked by:</Typography>
                                 {
-                                   <img src={`../images/${problem.company}.png`} alt={`${problem.company}`} height={'100%'} width={'20px'}/>          
+                                    (problem.company) && problem.company.map(company => { 
+                                        return (              
+                                            <img src={`../images/${company}.png`} alt={`${company}`} height={'100%'} width={'20px'}/>          
+                                        )
+                                    })                      
                                 }
                             </ProblemCompanyTags>
                         }
                         <ProblemStatementBody>
                             <Typography fontFamily={'consolas, sans-serif'} style={{textAlign: 'left', padding: '2%', display: 'flex', flexDirection: 'column'}}>
                                 {/* <Typography fontFamily={'consolas, sans-serif'} style={{fontWeight: 'bold', marginRight: '2%'}}>Problem Statement:</Typography> */}
-                                {problem.desc}
+                                {problem?.desc}
                             </Typography>
                             {
-                                problem.examples.map((example, index) => {
+                                problem?.examples.map((example, index) => {
                                     return (
                                         <ExampleBox>
                                             <Typography fontFamily={'consolas, sans-serif'} fontWeight={'bold'}>

@@ -8,7 +8,6 @@ import styled from '@emotion/styled';
 import axios from 'axios';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import CloseOutlined from '@mui/icons-material/CloseOutlined';
-import { type } from '@testing-library/user-event/dist/type';
 
 const Problems = ({color, bgColor}) => {
 
@@ -209,13 +208,24 @@ const Problems = ({color, bgColor}) => {
             return (
                 <ProblemCardBox>
                     <TitleAndCompanyBox>
-                        <Typography fontFamily={'consolas, sans-serif'} style={{fontWeight: 'bold', fontSize: '1.2rem'}}>
+                        <Typography fontFamily={'consolas, sans-serif'} style={{
+                            fontWeight: 'bold', 
+                            fontSize: '1.2rem',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '100%'
+                        }}>
                             {problem.title}
                         </Typography>
                         <CompanyTags>
                             <Typography fontFamily={'consolas, sans-serif'} style={{ fontSize: '0.8rem'}}>Asked by:</Typography>
                             {
-                                   <img src={`../images/${problem.company}.png`} alt={`${problem.company}`} height={'100%'} width={'20px'}/>          
+                                (problem.company) && problem.company.map(company => { 
+                                    return (              
+                                        <img src={`../images/${company}.png`} alt={`${company}`} height={'100%'} width={'20px'}/>          
+                                    )
+                                })                      
                             }
                         </CompanyTags>
                     </TitleAndCompanyBox>
@@ -549,7 +559,7 @@ const Problems = ({color, bgColor}) => {
             `
 
             const TitleAndCompanyBox = styled(Box)`
-                width: fit-content;
+                max-width: 70%;
                 text-align: left;
                 display: flex;
                 flex-direction: column;
@@ -598,12 +608,25 @@ const Problems = ({color, bgColor}) => {
             return (
                  <ProblemCardBox>
                     <TitleAndCompanyBox>
-                        <Typography fontFamily={'consolas, sans-serif'} style={{fontWeight: 'bold', fontSize: '1.2rem'}}>
-                            {problem.ttile}
+                        <Typography fontFamily={'consolas, sans-serif'} style={{
+                            fontWeight: 'bold', 
+                            fontSize: '1.2rem',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '100%'
+                        }}>
+                            {problem.title}
                         </Typography>
                         <CompanyTags>
                             <Typography fontFamily={'consolas, sans-serif'} style={{ fontSize: '0.8rem'}}>Asked by:</Typography>
-                                {problem.company}
+                            {
+                                (problem.company) && problem.company.map(company => { 
+                                    return (              
+                                        <img src={`../images/${company}.png`} alt={`${company}`} height={'100%'} width={'20px'}/>          
+                                    )
+                                })                      
+                            }
                         </CompanyTags>
                     </TitleAndCompanyBox>
                     <SolveAndStatsBox>
@@ -728,13 +751,14 @@ const Problems = ({color, bgColor}) => {
                             </Typography>
                             <ProblemOfTheDayBox>
                                 <Typography fontFamily={'consolas, sans-serif'} style={{textDecoration: 'underline'}}>
-                                    Problem of The Day : {potd.title}   
+                                    Problem of The Day
                                 </Typography>
+                                <ProblemCard problem = {potd}/>
                             </ProblemOfTheDayBox>
                             {
                                 problems.map((problem, id) => {
                                     return (
-                                       <div key = {id} ><p>{problem.title}</p></div>
+                                        <ProblemCard problem={problem} key={id}/>
                                     )
                                 })
                             }
